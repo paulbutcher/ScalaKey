@@ -6,26 +6,26 @@ import android.os.{Bundle, IBinder, ResultReceiver}
 import android.view.KeyEvent
 import android.view.inputmethod.{CompletionInfo, EditorInfo, ExtractedText, InputBinding, InputConnection}
 
-class ScalaKey extends AbstractInputMethodService {
+class ScalaKey extends AbstractInputMethodService with Logger {
 
   class InputMethodImpl extends AbstractInputMethodImpl {
-    def hideSoftInput(flags: Int, resultReceiver: ResultReceiver) {}
-    def showSoftInput(flags: Int, resultReceiver: ResultReceiver) {}
-    def restartInput(inputConnection: InputConnection, attribute: EditorInfo) {}
-    def startInput(inputConnection: InputConnection, info: EditorInfo) {}
-    def unbindInput() {}
-    def bindInput(binding: InputBinding) {}
-    def attachToken(token: IBinder) {}
+    def hideSoftInput(flags: Int, resultReceiver: ResultReceiver) { d("hideSoftInput") }
+    def showSoftInput(flags: Int, resultReceiver: ResultReceiver) { d("showSoftInput") }
+    def restartInput(inputConnection: InputConnection, attribute: EditorInfo) { d("restartInput") }
+    def startInput(inputConnection: InputConnection, info: EditorInfo) { d("startInput") }
+    def unbindInput() { d("unbindInput") }
+    def bindInput(binding: InputBinding) { d("bindInput") }
+    def attachToken(token: IBinder) { d("attachToken") }
   }
   
   class InputMethodSessionImpl extends AbstractInputMethodSessionImpl {
-    def toggleSoftInput(showFlags: Int, hideFlags: Int) {}
-    def appPrivateCommand(action: String, data: Bundle) {}
-    def updateExtractedText(token: Int, text: ExtractedText) {}
-    def displayCompletions(completions: Array[CompletionInfo]) {}
-    def updateCursor(newCursor: Rect) {}
-    def updateSelection(oldSelStart: Int, oldSelEnd: Int, newSelStart: Int, newSelEnd: Int, candidatesStart: Int, candidatesEnd: Int) {}
-    def finishInput() {}
+    def toggleSoftInput(showFlags: Int, hideFlags: Int) { d("toggleSoftInput") }
+    def appPrivateCommand(action: String, data: Bundle) { d("appPrivateCommand") }
+    def updateExtractedText(token: Int, text: ExtractedText) { d("updateExtractedText") }
+    def displayCompletions(completions: Array[CompletionInfo]) { d("displayCompletions") }
+    def updateCursor(newCursor: Rect) { d("updateCursor") }
+    def updateSelection(oldSelStart: Int, oldSelEnd: Int, newSelStart: Int, newSelEnd: Int, candidatesStart: Int, candidatesEnd: Int) { d("updateSelection") }
+    def finishInput() { d("finishInput") }
   }
   
   def onCreateInputMethodInterface(): AbstractInputMethodImpl = new InputMethodImpl
