@@ -7,7 +7,8 @@ import android.view.{Gravity, Window, WindowManager}
 
 class SoftInputWindow(context: Context) extends Dialog(context) {
   initDockWindow()
-  
+
+  // See android.inputmethodservice.SoftInputWindow.initDockWindow
   def initDockWindow() {
     var window = getWindow
     var lp = window.getAttributes
