@@ -7,15 +7,29 @@ import android.view.KeyEvent
 import android.view.inputmethod.{CompletionInfo, EditorInfo, ExtractedText, InputBinding, InputConnection}
 
 class ScalaKey extends AbstractInputMethodService with Logger {
+  
+  override def onCreate() {
+    d("OnCreate")
+    softInputWindow = new SoftInputWindow(this)
+  }
 
   class InputMethodImpl extends AbstractInputMethodImpl {
+
+    def attachToken(token: IBinder) {
+      d("attachToken")
+      softInputWindow.setToken(token)
+    }
+
+    def showSoftInput(flags: Int, resultReceiver: ResultReceiver) {
+      d("showSoftInput")
+      softInputWindow.show
+    }
+
     def hideSoftInput(flags: Int, resultReceiver: ResultReceiver) { d("hideSoftInput") }
-    def showSoftInput(flags: Int, resultReceiver: ResultReceiver) { d("showSoftInput") }
     def restartInput(inputConnection: InputConnection, attribute: EditorInfo) { d("restartInput") }
     def startInput(inputConnection: InputConnection, info: EditorInfo) { d("startInput") }
     def unbindInput() { d("unbindInput") }
     def bindInput(binding: InputBinding) { d("bindInput") }
-    def attachToken(token: IBinder) { d("attachToken") }
   }
   
   class InputMethodSessionImpl extends AbstractInputMethodSessionImpl {
@@ -36,4 +50,6 @@ class ScalaKey extends AbstractInputMethodService with Logger {
   def onKeyLongPress(keyCode: Int, event: KeyEvent) = false
   def onKeyMultiple(keyCode: Int, count: Int, event: KeyEvent) = false
   def onKeyUp(keyCode: Int, event: KeyEvent) = false
+  
+  private var softInputWindow: SoftInputWindow = _
 }
