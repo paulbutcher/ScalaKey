@@ -2,12 +2,13 @@ package com.paulbutcher.scalakey
 
 import android.content.Context
 import android.graphics.{BitmapFactory, Canvas}
-import android.view.View
+import android.view.{Display, View, WindowManager}
 
 class RippleView(context: Context) extends View(context) with Logger {
 
   val bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.water)
-  val mesh = new Mesh(400, 240)
+  val (width, height) = getSize
+  val mesh = new Mesh(width, height)
   
   override def onDraw(canvas: Canvas) {
     d("onDraw")
@@ -15,7 +16,14 @@ class RippleView(context: Context) extends View(context) with Logger {
   }
   
   override def onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    d("setMeasuredDimension: "+ widthMeasureSpec +", "+ heightMeasureSpec)
-    setMeasuredDimension(100, 100)
+    d("onMeasure")
+    setMeasuredDimension(width, height)
+  }
+  
+  private def getSize(): (Int, Int) = {
+    val windowManager = context.getSystemService(Context.WINDOW_SERVICE).asInstanceOf[WindowManager]
+    val display = windowManager.getDefaultDisplay
+    val width = display.getWidth
+    (width, width * bitmap.getHeight / bitmap.getWidth)
   }
 }
