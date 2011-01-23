@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.IBinder
 import android.view.{Gravity, ViewGroup, Window, WindowManager}
 
-class SoftInputWindow(context: Context, theme: Int) extends Dialog(context, theme) {
+class SoftInputWindow(context: Context, theme: Int) extends Dialog(context, theme) with Logger {
   
   def this(context: Context) {
     this(context, android.R.style.Theme_InputMethod)
@@ -15,6 +15,8 @@ class SoftInputWindow(context: Context, theme: Int) extends Dialog(context, them
 
   // See android.inputmethodservice.SoftInputWindow.initDockWindow
   def initDockWindow() {
+    d("initDockWindow")
+
     var window = getWindow
     var lp = window.getAttributes
     

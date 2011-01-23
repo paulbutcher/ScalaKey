@@ -1,11 +1,14 @@
 package com.paulbutcher.scalakey
 
 import android.content.Context
-import android.view.{View, WindowManager}
+import android.opengl.GLSurfaceView
+import android.view.WindowManager
 
-class RippleView(context: Context) extends View(context) with Logger {
+class RippleView(context: Context) extends GLSurfaceView(context) with Logger {
 
   val (width, height) = getSize
+  
+  setRenderer(new RippleRenderer)
   
   override def onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     d("onMeasure")
