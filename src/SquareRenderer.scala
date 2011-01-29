@@ -73,12 +73,6 @@ class SquareRenderer(context: Context) extends Renderer {
   	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR)
 
     GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0)
-  }
-  
-  def onDrawFrame(gl: GL10) {
-    gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT)
-    gl.glLoadIdentity();
-		gl.glTranslatef(0, 0, -4); 
 
     gl.glFrontFace(GL10.GL_CCW)
     gl.glEnable(GL10.GL_CULL_FACE)
@@ -87,18 +81,18 @@ class SquareRenderer(context: Context) extends Renderer {
     gl.glEnable(GL10.GL_TEXTURE_2D)
     gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY)
     gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer)
-    gl.glBindTexture(GL10.GL_TEXTURE_2D, textures(0))
-    
+
     gl.glEnableClientState(GL10.GL_VERTEX_ARRAY)
     gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer)
+  }
+  
+  def onDrawFrame(gl: GL10) {
+    gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT)
+    gl.glLoadIdentity
+    gl.glTranslatef(0, 0, -4)
+
     gl.glDrawElements(GL10.GL_TRIANGLES, indexBuffer.capacity,
       GL10.GL_UNSIGNED_SHORT, indexBuffer)
-      
-    gl.glDisableClientState(GL10.GL_VERTEX_ARRAY)
-    gl.glDisable(GL10.GL_CULL_FACE)
-    
-    gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY)
-    gl.glDisable(GL10.GL_TEXTURE_2D)
   }
   
   def onSurfaceChanged(gl: GL10, width: Int, height: Int) {
