@@ -34,7 +34,7 @@ class SoftInputWindow(context: Context, theme: Int) extends Dialog(context, them
       WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
       WindowManager.LayoutParams.FLAG_DIM_BEHIND); 
       
-    setContentView(new RippleView(context))
+    setContentView(new SquareView(context))
     
     window.setLayout(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
   }

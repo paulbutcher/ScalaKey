@@ -20,7 +20,6 @@ class RippleRenderer extends GLSurfaceView.Renderer {
   def onDrawFrame(gl: GL10)
 }
 
-object RippleRenderer extends Logger {
-  d("Loading ripple library")
+object RippleRenderer {
   System.loadLibrary("ripple")
 }

@@ -4,11 +4,11 @@ import android.content.Context
 import android.opengl.GLSurfaceView
 import android.view.WindowManager
 
-class RippleView(context: Context) extends GLSurfaceView(context) with Logger {
+class SquareView(context: Context) extends GLSurfaceView(context) with Logger {
 
   val (width, height) = getSize
   
-  setRenderer(new RippleRenderer)
+  setRenderer(new SquareRenderer(context))
   
   override def onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     d("onMeasure")
