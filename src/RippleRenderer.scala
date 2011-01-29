@@ -11,7 +11,7 @@ import android.opengl.GLSurfaceView.Renderer
 import android.opengl.GLU
 import android.opengl.GLUtils
 
-class SquareRenderer(context: Context) extends Renderer with Logger {
+class RippleRenderer(context: Context) extends Renderer with Logger {
   
   val vertexBuffer = {
       val vertices = Array(
