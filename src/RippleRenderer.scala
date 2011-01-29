@@ -13,48 +13,24 @@ import android.opengl.GLUtils
 
 class RippleRenderer(context: Context) extends Renderer with Logger {
   
-  val vertexBuffer = {
-      val vertices = Array(
-          -1.0f,  1.0f, 0.0f,
-          -1.0f, -1.0f, 0.0f,
-           1.0f, -1.0f, 0.0f,
-           1.0f,  1.0f, 0.5f
-        )
-
-      val vertexByteBuffer = ByteBuffer.allocateDirect(vertices.length * 4)
-      vertexByteBuffer.order(ByteOrder.nativeOrder)
-      val vertexBuffer_ = vertexByteBuffer.asFloatBuffer
-      vertexBuffer_.put(vertices)
-      vertexBuffer_.position(0)
-      vertexBuffer_
-    }
+  val mesh = new Mesh(2.0f, 2.0f, 5, 5)
   
-  val indexBuffer = {
-    val indices = Array[Short](0, 1, 2, 0, 2, 3)
-
-    val indexByteBuffer = ByteBuffer.allocateDirect(indices.length * 2)
-    indexByteBuffer.order(ByteOrder.nativeOrder)
-    val indexBuffer_ = indexByteBuffer.asShortBuffer
-    indexBuffer_.put(indices)
-    indexBuffer_.position(0)
-  }
-  
-  val textureBuffer = {
-    val textureCoordinates = Array[Float](
-        0.0f, 0.0f,
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        1.0f, 0.0f
-      )
-
-    val textureByteBuffer = ByteBuffer.allocateDirect(textureCoordinates.length * 4)
-    textureByteBuffer.order(ByteOrder.nativeOrder)
-    val textureBuffer_ = textureByteBuffer.asFloatBuffer
-    textureBuffer_.put(textureCoordinates)
-    textureBuffer_.position(0)
-  }
-  
-  val textures = new Array[Int](1)
+  // val textureBuffer = {
+  //   val textureCoordinates = Array[Float](
+  //       0.0f, 0.0f,
+  //       0.0f, 1.0f,
+  //       1.0f, 1.0f,
+  //       1.0f, 0.0f
+  //     )
+  // 
+  //   val textureByteBuffer = ByteBuffer.allocateDirect(textureCoordinates.length * 4)
+  //   textureByteBuffer.order(ByteOrder.nativeOrder)
+  //   val textureBuffer_ = textureByteBuffer.asFloatBuffer
+  //   textureBuffer_.put(textureCoordinates)
+  //   textureBuffer_.position(0)
+  // }
+  // 
+  // val textures = new Array[Int](1)
 
   def onSurfaceCreated(gl: GL10, config: EGLConfig) {
     d("onSurfaceCreated")
@@ -66,40 +42,40 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
     gl.glDepthFunc(GL10.GL_LEQUAL)
     gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST)
     
-    val bitmap = BitmapFactory.decodeResource(context.getResources, R.drawable.keys)
+    //     val bitmap = BitmapFactory.decodeResource(context.getResources, R.drawable.keys)
+    // 
+    //     gl.glGenTextures(1, textures, 0)
+    //     gl.glBindTexture(GL10.GL_TEXTURE_2D, textures(0))
+    //     
+    //     gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR)
+    // gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR)
+    // 
+    //     GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0)
 
-    gl.glGenTextures(1, textures, 0)
-    gl.glBindTexture(GL10.GL_TEXTURE_2D, textures(0))
-    
-    gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR)
-  	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR)
-
-    GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0)
-
-    gl.glFrontFace(GL10.GL_CCW)
+    gl.glFrontFace(GL10.GL_CW)
     gl.glEnable(GL10.GL_CULL_FACE)
     gl.glCullFace(GL10.GL_BACK)
     
-    gl.glEnable(GL10.GL_TEXTURE_2D)
-    gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY)
-    gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer)
+    // gl.glEnable(GL10.GL_TEXTURE_2D)
+    // gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY)
+    // gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer)
 
     gl.glEnableClientState(GL10.GL_VERTEX_ARRAY)
-    gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer)
+    gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mesh.vertexBuffer)
   }
   
   def onDrawFrame(gl: GL10) {
     d("onDrawFrame")
-
+    
     val z = math.sin(System.currentTimeMillis/(math.Pi * 1000)).toFloat
-    vertexBuffer.put(11, z)    
+    mesh.vertexBuffer.put(2, z)
 
     gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT)
     gl.glLoadIdentity
     gl.glTranslatef(0, 0, -4)
 
-    gl.glDrawElements(GL10.GL_TRIANGLES, indexBuffer.capacity,
-      GL10.GL_UNSIGNED_SHORT, indexBuffer)
+    gl.glDrawElements(GL10.GL_TRIANGLE_STRIP, mesh.indexCount,
+      GL10.GL_UNSIGNED_SHORT, mesh.indexBuffer)
   }
   
   def onSurfaceChanged(gl: GL10, width: Int, height: Int) {
