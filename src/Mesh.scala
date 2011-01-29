@@ -16,6 +16,9 @@ class Mesh(width: Float, height: Float, columns: Int, rows: Int) {
   val indexBuffer = allocateDirectShortBuffer(indexCount)
   initializeIndexes
   
+  val textureBuffer = allocateDirectFloatBuffer(vertexCount * 2)
+  initializeTextureCoordinates
+  
   private def allocateDirectFloatBuffer(size: Int) = {
     val sizeofFloat = 4
     val byteBuffer = ByteBuffer.allocateDirect(size * sizeofFloat)
@@ -34,10 +37,10 @@ class Mesh(width: Float, height: Float, columns: Int, rows: Int) {
     // Generate vertices in the range [-width/2 ... 0 ... width/2]
     // and similarly for height
     for {
-      ypos <- -height / 2 to height / 2 by height / (rows - 1)
-      xpos <- -width / 2 to width / 2 by width / (columns - 1)
+      y <- -height / 2 to height / 2 by height / (rows - 1)
+      x <- -width / 2 to width / 2 by width / (columns - 1)
     }
-      vertexBuffer.put(Array(xpos.toFloat, ypos.toFloat, 0.0f))
+      vertexBuffer.put(Array(x.toFloat, y.toFloat, 0.0f))
     vertexBuffer.position(0)
   }
   
@@ -57,5 +60,14 @@ class Mesh(width: Float, height: Float, columns: Int, rows: Int) {
       }
     }
     indexBuffer.position(0)
+  }
+  
+  private def initializeTextureCoordinates() {
+    for {
+      v <- 1.0 to 0.0 by -1.0 / (rows - 1)
+      u <- 0.0 to 1.0 by 1.0 / (columns - 1)
+    }
+      textureBuffer.put(Array(u.toFloat, v.toFloat))
+    textureBuffer.position(0)
   }
 }
