@@ -13,7 +13,14 @@ import android.opengl.GLUtils
 
 class RippleRenderer(context: Context) extends Renderer with Logger {
   
-  val mesh = Mesh.create(2.0f, 2.0f, 65, 65)
+  val aspectRatio = 1.5f
+  
+  val height = 2.0f
+  val width = (height * aspectRatio).toFloat
+  val rows = 65
+  val columns = ((rows - 1) * aspectRatio + 1).toInt
+  
+  val mesh = Mesh.create(width, height, columns, rows)
   
   val textures = new Array[Int](1)
   
@@ -58,7 +65,9 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
     
     gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT)
     gl.glLoadIdentity
-    gl.glTranslatef(0, 0, -4)
+
+    val planeDistance = 1.0 / -math.tan(math.Pi / 8)
+    gl.glTranslatef(0.0f, 0.0f, planeDistance.toFloat)
 
     gl.glDrawElements(GL10.GL_TRIANGLE_STRIP, mesh.indexCount,
       GL10.GL_UNSIGNED_SHORT, mesh.indexBuffer)
@@ -66,11 +75,15 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
   
   def onSurfaceChanged(gl: GL10, width: Int, height: Int) {
     d("onSurfaceChanged: "+ width +", "+ height)
+    
+    // val aspect = width.toFloat / height
+    // val bt = math.tan(math.Pi / 8)
+    // val lr = bt * aspect
 
     gl.glViewport(0, 0, width, height)
     gl.glMatrixMode(GL10.GL_PROJECTION)
     gl.glLoadIdentity
-    GLU.gluPerspective(gl, 45.0f, width.asInstanceOf[Float] / height, 0.1f, 100.0f)
+    GLU.gluPerspective(gl, 45.0f, width.asInstanceOf[Float] / height, 1.0f, 10.0f)
     gl.glMatrixMode(GL10.GL_MODELVIEW)
     gl.glLoadIdentity
   }

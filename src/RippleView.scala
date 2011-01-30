@@ -5,11 +5,11 @@ import android.opengl.GLSurfaceView
 import android.view.{MotionEvent, WindowManager}
 
 class RippleView(context: Context) extends GLSurfaceView(context) with Logger {
-
-  val (width, height) = getSize
   
   val renderer = new RippleRenderer(context)
   setRenderer(renderer)
+  
+  val (width, height) = getSize
   
   override def onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     d("onMeasure")
@@ -33,6 +33,6 @@ class RippleView(context: Context) extends GLSurfaceView(context) with Logger {
     val windowManager = context.getSystemService(Context.WINDOW_SERVICE).asInstanceOf[WindowManager]
     val display = windowManager.getDefaultDisplay
     val width = display.getWidth
-    (width, 400)//! TODO - sort out height
+    (width, (width / renderer.aspectRatio).toInt)
   }
 }
