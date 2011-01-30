@@ -23,6 +23,20 @@ class Mesh private (width_ : Float, height_ : Float, columns_ : Int, rows_ : Int
   
   initializeBuffers
   
+  var rippleX = 0.0f
+  var rippleY = 0.0f
+  var startTime = 0L
+  
+  def startRipple(x: Float, y: Float) {
+    startTime = System.currentTimeMillis
+    rippleX = x
+    rippleY = y
+  }
+  
+  def update() {
+    ripple(System.currentTimeMillis - startTime)
+  }
+
   private def allocateDirectFloatBuffer(size: Int) = {
     val sizeofFloat = 4
     val byteBuffer = ByteBuffer.allocateDirect(size * sizeofFloat)
@@ -37,7 +51,7 @@ class Mesh private (width_ : Float, height_ : Float, columns_ : Int, rows_ : Int
     byteBuffer.asShortBuffer
   }
   
-  @native def ripple(elapsed: Long)
+  @native private def ripple(elapsed: Long)
   
   @native private def initializeBuffers()
 }

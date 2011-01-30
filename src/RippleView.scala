@@ -18,9 +18,13 @@ class RippleView(context: Context) extends GLSurfaceView(context) with Logger {
   
   override def onTouchEvent(event: MotionEvent) = {
     if (event.getAction == MotionEvent.ACTION_DOWN) {
+      val actionIndex = event.getActionIndex
+      val x = event.getX(actionIndex)
+      val y = event.getY(actionIndex)
+
       queueEvent(new Runnable() {
           def run() {
-            renderer.startRipple
+            renderer.startRipple(x, y)
           }
         })
       true

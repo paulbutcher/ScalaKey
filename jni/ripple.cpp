@@ -123,15 +123,3 @@ Java_com_paulbutcher_scalakey_Mesh_ripple(JNIEnv* env, jobject obj, jlong elapse
         }
     }
 }
-
-// def warp(x: Float, y: Float, ix: Int, iy: Int): (Float, Float) = {
-//   val (dx, dy) = (x - centreX, y - centreY)
-//   
-//   if (abs(radius * radius - (dx * dx + dy * dy)) < wavelength * wavelength) {
-//     val theta = atan(dx / dy)
-//     val (xx, yy) = (x + amplitude * sin(theta), y + cos(theta))
-//     (xx.asInstanceOf[Float], yy.asInstanceOf[Float])
-//   } else {
-//     (x, y)
-//   }
-// }

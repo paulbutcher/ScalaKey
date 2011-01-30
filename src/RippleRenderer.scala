@@ -14,23 +14,22 @@ import android.opengl.GLUtils
 class RippleRenderer(context: Context) extends Renderer with Logger {
   
   val aspectRatio = 1.5f
-  
-  val height = 2.0f
-  val width = (height * aspectRatio).toFloat
+  val meshHeight = 2.0f
+  val meshWidth = (meshHeight * aspectRatio).toFloat
   val rows = 65
   val columns = ((rows - 1) * aspectRatio + 1).toInt
+  val mesh = Mesh.create(meshWidth, meshHeight, columns, rows)
+  
+  var windowWidth: Int = _
+  var windowHeight: Int = _
   
   val planeDistance = (1.0 / -math.tan(math.Pi / 8)).toFloat
-
-  val mesh = Mesh.create(width, height, columns, rows)
   
   val textures = new Array[Int](1)
   
-  var startTime = 0L;
-
   def onSurfaceCreated(gl: GL10, config: EGLConfig) {
     d("onSurfaceCreated")
-
+    
     gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
     gl.glShadeModel(GL10.GL_SMOOTH)
     gl.glClearDepthf(1.0f)
@@ -63,7 +62,7 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
   def onDrawFrame(gl: GL10) {
     d("onDrawFrame")
     
-    mesh.ripple(System.currentTimeMillis - startTime)
+    mesh.update
     
     gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT)
     gl.glLoadIdentity
@@ -77,6 +76,9 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
   def onSurfaceChanged(gl: GL10, width: Int, height: Int) {
     d("onSurfaceChanged: "+ width +", "+ height)
     
+    windowWidth = width
+    windowHeight = height
+    
     gl.glViewport(0, 0, width, height)
     gl.glMatrixMode(GL10.GL_PROJECTION)
     gl.glLoadIdentity
@@ -85,7 +87,10 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
     gl.glLoadIdentity
   }
   
-  def startRipple() {
-    startTime = System.currentTimeMillis
+  def startRipple(x: Float, y: Float) {
+    val worldX = x / windowWidth * meshWidth - meshWidth / 2
+    val worldY = y / windowHeight * meshHeight - meshHeight / 2
+    
+    mesh.startRipple(worldX, worldY)
   }
 }
