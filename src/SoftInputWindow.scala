@@ -32,7 +32,7 @@ class SoftInputWindow(context: Context, theme: Int) extends Dialog(context, them
       WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
       WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
       WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-      WindowManager.LayoutParams.FLAG_DIM_BEHIND); 
+      WindowManager.LayoutParams.FLAG_DIM_BEHIND)
       
     setContentView(new RippleView(context))
     

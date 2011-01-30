@@ -25,7 +25,11 @@ class ScalaKey extends AbstractInputMethodService with Logger {
       softInputWindow.show
     }
 
-    def hideSoftInput(flags: Int, resultReceiver: ResultReceiver) { d("hideSoftInput") }
+    def hideSoftInput(flags: Int, resultReceiver: ResultReceiver) {
+      d("hideSoftInput")
+      softInputWindow.hide
+    }
+    
     def restartInput(inputConnection: InputConnection, attribute: EditorInfo) { d("restartInput") }
     def startInput(inputConnection: InputConnection, info: EditorInfo) { d("startInput") }
     def unbindInput() { d("unbindInput") }
