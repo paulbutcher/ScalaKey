@@ -13,7 +13,7 @@ import android.opengl.GLUtils
 
 class RippleRenderer(context: Context) extends Renderer with Logger {
   
-  val mesh = new Mesh(2.0f, 2.0f, 65, 65)
+  val mesh = Mesh.create(2.0f, 2.0f, 65, 65)
   
   val textures = new Array[Int](1)
 

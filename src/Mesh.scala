@@ -2,11 +2,15 @@ package com.paulbutcher.scalakey
 
 import java.nio.{ByteBuffer, ByteOrder, FloatBuffer, ShortBuffer}
 
-class Mesh(width: Float, height: Float, columns: Int, rows: Int) {
+class Mesh private (width_ : Float, height_ : Float, columns_ : Int, rows_ : Int) {
+  
+  val width = width_
+  val height = height_
+  val columns = columns_
+  val rows = rows_
   
   val vertexCount = columns * rows
   val vertexBuffer = allocateDirectFloatBuffer(vertexCount * 3)
-  initializeVertices
   
   val indexCount = {
     val vertices = 2 * columns * (rows - 1)
@@ -14,10 +18,10 @@ class Mesh(width: Float, height: Float, columns: Int, rows: Int) {
     vertices + degenerateVertices
   }
   val indexBuffer = allocateDirectShortBuffer(indexCount)
-  initializeIndexes
   
   val textureBuffer = allocateDirectFloatBuffer(vertexCount * 2)
-  initializeTextureCoordinates
+  
+  initializeBuffers
   
   private def allocateDirectFloatBuffer(size: Int) = {
     val sizeofFloat = 4
@@ -33,41 +37,12 @@ class Mesh(width: Float, height: Float, columns: Int, rows: Int) {
     byteBuffer.asShortBuffer
   }
   
-  private def initializeVertices() {
-    // Generate vertices in the range [-width/2 ... 0 ... width/2]
-    // and similarly for height
-    for {
-      y <- -height / 2 to height / 2 by height / (rows - 1)
-      x <- -width / 2 to width / 2 by width / (columns - 1)
-    }
-      vertexBuffer.put(Array(x.toFloat, y.toFloat, 0.0f))
-    vertexBuffer.position(0)
-  }
-  
-  private def initializeIndexes() {
-    // Indices for a single triangle strip. See:
-    // http://marc.blog.atpurpose.com/2009/10/24/programatically-generating-a-rectangular-mesh-using-single-gl_triangle_strip/
-    for (row <- 0 until rows - 1) {
-      for (column <- 0 until columns) {
-        indexBuffer.put((row * columns + column).toShort)
-        indexBuffer.put(((row + 1) * columns + column).toShort)
-      }
+  @native private def initializeBuffers()
+}
 
-      // Extra vertices (of degenerate triangles) at the end of this row connecting it to the start of the next one
-      if (row < (rows - 2)) {
-        indexBuffer.put(((row + 1) * columns + (columns - 1)).toShort)
-        indexBuffer.put(((row + 1) * columns).toShort)
-      }
-    }
-    indexBuffer.position(0)
-  }
+object Mesh {
+  System.loadLibrary("ripple")
   
-  private def initializeTextureCoordinates() {
-    for {
-      v <- 1.0 to 0.0 by -1.0 / (rows - 1)
-      u <- 0.0 to 1.0 by 1.0 / (columns - 1)
-    }
-      textureBuffer.put(Array(u.toFloat, v.toFloat))
-    textureBuffer.position(0)
-  }
+  def create(width: Float, height: Float, columns: Int, rows: Int) =
+    new Mesh(width, height, columns, rows)
 }
