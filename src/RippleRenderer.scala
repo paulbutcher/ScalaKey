@@ -16,6 +16,8 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
   val mesh = Mesh.create(2.0f, 2.0f, 65, 65)
   
   val textures = new Array[Int](1)
+  
+  var startTime = 0L;
 
   def onSurfaceCreated(gl: GL10, config: EGLConfig) {
     d("onSurfaceCreated")
@@ -52,9 +54,8 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
   def onDrawFrame(gl: GL10) {
     d("onDrawFrame")
     
-    val z = math.sin(System.currentTimeMillis/(math.Pi * 1000)).toFloat
-    mesh.vertexBuffer.put(2, z)
-
+    mesh.ripple(System.currentTimeMillis - startTime)
+    
     gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT)
     gl.glLoadIdentity
     gl.glTranslatef(0, 0, -4)
@@ -72,5 +73,9 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
     GLU.gluPerspective(gl, 45.0f, width.asInstanceOf[Float] / height, 0.1f, 100.0f)
     gl.glMatrixMode(GL10.GL_MODELVIEW)
     gl.glLoadIdentity
+  }
+  
+  def startRipple() {
+    startTime = System.currentTimeMillis
   }
 }

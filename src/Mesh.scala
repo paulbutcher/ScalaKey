@@ -37,9 +37,9 @@ class Mesh private (width_ : Float, height_ : Float, columns_ : Int, rows_ : Int
     byteBuffer.asShortBuffer
   }
   
-  @native private def initializeBuffers()
+  @native def ripple(elapsed: Long)
   
-  @native private def ripple(now: Long)
+  @native private def initializeBuffers()
 }
 
 object Mesh {

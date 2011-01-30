@@ -9,6 +9,11 @@
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
+static const float amplitude = 0.5;
+static const float wavepacket = 0.1;
+static const float speed = 0.5;
+static const float attenuation = 2.0;
+
 static jclass clazz = 0;
 static jmethodID columnsId = 0;
 static jmethodID rowsId = 0;
@@ -85,7 +90,7 @@ Java_com_paulbutcher_scalakey_Mesh_initializeBuffers(JNIEnv* env, jobject obj)
 }
 
 JNIEXPORT void JNICALL
-Java_com_paulbutcher_scalakey_Mesh_ripple(JNIEnv* env, jobject obj, jlong now)
+Java_com_paulbutcher_scalakey_Mesh_ripple(JNIEnv* env, jobject obj, jlong elapsed)
 {
     jint columns = env->CallIntMethod(obj, columnsId);
     jint rows = env->CallIntMethod(obj, rowsId);
@@ -94,6 +99,9 @@ Java_com_paulbutcher_scalakey_Mesh_ripple(JNIEnv* env, jobject obj, jlong now)
 
     jobject vertexBufferObj = env->CallObjectMethod(obj, vertexBufferId);
     float* vertexBuffer = reinterpret_cast<float*>(env->GetDirectBufferAddress(vertexBufferObj));
+    
+    float distance = elapsed / 1000.0 * speed;
+    float waveHeight = amplitude * exp(-(distance * distance)) / attenuation;
 
     // Generate vertices in the range [-width/2 ... 0 ... width/2]
     // and similarly for height
@@ -104,13 +112,26 @@ Java_com_paulbutcher_scalakey_Mesh_ripple(JNIEnv* env, jobject obj, jlong now)
         for(int j = 0; j < columns; ++j) {
             jfloat x = -width / 2 + width * (float)j / (float)(columns - 1);
             
-            jfloat r = sqrt(x * x * y * y);
+            jfloat r = sqrt(x * x + y * y);
+            jfloat delta = (distance - r) / wavepacket;
             
             vertex[0] = x;
             vertex[1] = y;
-            vertex[2] = 0.0;
+            vertex[2] = exp(-(delta * delta)) * waveHeight;
 
             vertex += 3;
         }
     }
 }
+
+// def warp(x: Float, y: Float, ix: Int, iy: Int): (Float, Float) = {
+//   val (dx, dy) = (x - centreX, y - centreY)
+//   
+//   if (abs(radius * radius - (dx * dx + dy * dy)) < wavelength * wavelength) {
+//     val theta = atan(dx / dy)
+//     val (xx, yy) = (x + amplitude * sin(theta), y + cos(theta))
+//     (xx.asInstanceOf[Float], yy.asInstanceOf[Float])
+//   } else {
+//     (x, y)
+//   }
+// }
