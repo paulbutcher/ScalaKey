@@ -38,6 +38,8 @@ class Mesh private (width_ : Float, height_ : Float, columns_ : Int, rows_ : Int
   }
   
   @native private def initializeBuffers()
+  
+  @native private def ripple(now: Long)
 }
 
 object Mesh {

@@ -15,6 +15,14 @@ extern "C" {
 JNIEXPORT void JNICALL Java_com_paulbutcher_scalakey_Mesh_initializeBuffers
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_paulbutcher_scalakey_Mesh
+ * Method:    ripple
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_paulbutcher_scalakey_Mesh_ripple
+  (JNIEnv *, jobject, jlong);
+
 #ifdef __cplusplus
 }
 #endif

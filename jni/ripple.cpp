@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <android/log.h>
 #include <GLES/gl.h>
+#include <cmath>
 
 #include "com_paulbutcher_scalakey_Mesh.h"
 
@@ -8,46 +9,45 @@
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
+static jclass clazz = 0;
+static jmethodID columnsId = 0;
+static jmethodID rowsId = 0;
+static jmethodID widthId = 0;
+static jmethodID heightId = 0;
+static jmethodID vertexBufferId = 0;
+static jmethodID indexBufferId = 0;
+static jmethodID textureBufferId = 0;
+
+static void initIDs(JNIEnv* env, jobject obj) {
+    clazz = env->GetObjectClass(obj);
+
+    columnsId = env->GetMethodID(clazz, "columns", "()I");
+    rowsId = env->GetMethodID(clazz, "rows", "()I");
+    widthId = env->GetMethodID(clazz, "width", "()F");
+    heightId = env->GetMethodID(clazz, "height", "()F");
+    vertexBufferId = env->GetMethodID(clazz, "vertexBuffer", "()Ljava/nio/FloatBuffer;");
+    indexBufferId = env->GetMethodID(clazz, "indexBuffer", "()Ljava/nio/ShortBuffer;");
+    textureBufferId = env->GetMethodID(clazz, "textureBuffer", "()Ljava/nio/FloatBuffer;");
+}
+
 JNIEXPORT void JNICALL
 Java_com_paulbutcher_scalakey_Mesh_initializeBuffers(JNIEnv* env, jobject obj)
 {
     LOGI("initializeBuffers");
+    
+    initIDs(env, obj);
 
-    jclass clazz = env->GetObjectClass(obj);
-
-    jmethodID columnsId = env->GetMethodID(clazz, "columns", "()I");
     jint columns = env->CallIntMethod(obj, columnsId);
-
-    jmethodID rowsId = env->GetMethodID(clazz, "rows", "()I");
     jint rows = env->CallIntMethod(obj, rowsId);
 
-    jmethodID widthId = env->GetMethodID(clazz, "width", "()F");
-    jfloat width = env->CallFloatMethod(obj, widthId);
-    
-    jmethodID heightId = env->GetMethodID(clazz, "height", "()F");
-    jfloat height = env->CallFloatMethod(obj, heightId);
-
-    jmethodID vertexBufferId = env->GetMethodID(clazz, "vertexBuffer", "()Ljava/nio/FloatBuffer;");
     jobject vertexBufferObj = env->CallObjectMethod(obj, vertexBufferId);
     float* vertexBuffer = reinterpret_cast<float*>(env->GetDirectBufferAddress(vertexBufferObj));
-
-    // Generate vertices in the range [-width/2 ... 0 ... width/2]
-    // and similarly for height
-    float* vertex = vertexBuffer;
-    for(int i = 0; i < rows; ++i) {
-        jfloat y = -height / 2 + height * (float)i / (float)(rows - 1);
-        for(int j = 0; j < columns; ++j) {
-            jfloat x = -width / 2 + width * (float)j / (float)(columns - 1);
-            
-            vertex[0] = x;
-            vertex[1] = y;
-            vertex[2] = 0.0;
-
-            vertex += 3;
-        }
+    
+    // Just zero everything for now - vertices are actually calculated in ripple below
+    for(int i = 0; i < columns * rows; ++i) {
+        vertexBuffer[i] = 0.0;
     }
     
-    jmethodID indexBufferId = env->GetMethodID(clazz, "indexBuffer", "()Ljava/nio/ShortBuffer;");
     jobject indexBufferObj = env->CallObjectMethod(obj, indexBufferId);
     short* indexBuffer = reinterpret_cast<short*>(env->GetDirectBufferAddress(indexBufferObj));
     
@@ -67,7 +67,6 @@ Java_com_paulbutcher_scalakey_Mesh_initializeBuffers(JNIEnv* env, jobject obj)
         }
     }
     
-    jmethodID textureBufferId = env->GetMethodID(clazz, "textureBuffer", "()Ljava/nio/FloatBuffer;");
     jobject textureBufferObj = env->CallObjectMethod(obj, textureBufferId);
     float* textureBuffer = reinterpret_cast<float*>(env->GetDirectBufferAddress(textureBufferObj));
     
@@ -81,6 +80,37 @@ Java_com_paulbutcher_scalakey_Mesh_initializeBuffers(JNIEnv* env, jobject obj)
             textureCoord[1] = v;
             
             textureCoord += 2;
+        }
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_paulbutcher_scalakey_Mesh_ripple(JNIEnv* env, jobject obj, jlong now)
+{
+    jint columns = env->CallIntMethod(obj, columnsId);
+    jint rows = env->CallIntMethod(obj, rowsId);
+    jfloat width = env->CallFloatMethod(obj, widthId);
+    jfloat height = env->CallFloatMethod(obj, heightId);
+
+    jobject vertexBufferObj = env->CallObjectMethod(obj, vertexBufferId);
+    float* vertexBuffer = reinterpret_cast<float*>(env->GetDirectBufferAddress(vertexBufferObj));
+
+    // Generate vertices in the range [-width/2 ... 0 ... width/2]
+    // and similarly for height
+    float* vertex = vertexBuffer;
+    for(int i = 0; i < rows; ++i) {
+        jfloat y = -height / 2 + height * (float)i / (float)(rows - 1);
+
+        for(int j = 0; j < columns; ++j) {
+            jfloat x = -width / 2 + width * (float)j / (float)(columns - 1);
+            
+            jfloat r = sqrt(x * x * y * y);
+            
+            vertex[0] = x;
+            vertex[1] = y;
+            vertex[2] = 0.0;
+
+            vertex += 3;
         }
     }
 }
