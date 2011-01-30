@@ -89,7 +89,7 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
   
   def startRipple(x: Float, y: Float) {
     val worldX = x / windowWidth * meshWidth - meshWidth / 2
-    val worldY = y / windowHeight * meshHeight - meshHeight / 2
+    val worldY = (windowHeight - y) / windowHeight * meshHeight - meshHeight / 2
     
     mesh.startRipple(worldX, worldY)
   }

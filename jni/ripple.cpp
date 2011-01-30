@@ -22,6 +22,8 @@ static jmethodID heightId = 0;
 static jmethodID vertexBufferId = 0;
 static jmethodID indexBufferId = 0;
 static jmethodID textureBufferId = 0;
+static jmethodID rippleXId = 0;
+static jmethodID rippleYId = 0;
 
 static void initIDs(JNIEnv* env, jobject obj) {
     clazz = env->GetObjectClass(obj);
@@ -33,6 +35,8 @@ static void initIDs(JNIEnv* env, jobject obj) {
     vertexBufferId = env->GetMethodID(clazz, "vertexBuffer", "()Ljava/nio/FloatBuffer;");
     indexBufferId = env->GetMethodID(clazz, "indexBuffer", "()Ljava/nio/ShortBuffer;");
     textureBufferId = env->GetMethodID(clazz, "textureBuffer", "()Ljava/nio/FloatBuffer;");
+    rippleXId = env->GetMethodID(clazz, "rippleX", "()F");
+    rippleYId = env->GetMethodID(clazz, "rippleY", "()F");
 }
 
 JNIEXPORT void JNICALL
@@ -96,6 +100,9 @@ Java_com_paulbutcher_scalakey_Mesh_ripple(JNIEnv* env, jobject obj, jlong elapse
     jint rows = env->CallIntMethod(obj, rowsId);
     jfloat width = env->CallFloatMethod(obj, widthId);
     jfloat height = env->CallFloatMethod(obj, heightId);
+    
+    jfloat rippleX = env->CallFloatMethod(obj, rippleXId);
+    jfloat rippleY = env->CallFloatMethod(obj, rippleYId);
 
     jobject vertexBufferObj = env->CallObjectMethod(obj, vertexBufferId);
     float* vertexBuffer = reinterpret_cast<float*>(env->GetDirectBufferAddress(vertexBufferObj));
@@ -112,7 +119,10 @@ Java_com_paulbutcher_scalakey_Mesh_ripple(JNIEnv* env, jobject obj, jlong elapse
         for(int j = 0; j < columns; ++j) {
             jfloat x = -width / 2 + width * (float)j / (float)(columns - 1);
             
-            jfloat r = sqrt(x * x + y * y);
+            jfloat xdelta = x - rippleX;
+            jfloat ydelta = y - rippleY;
+            jfloat r = sqrt(xdelta * xdelta + ydelta * ydelta);
+
             jfloat delta = (distance - r) / wavepacket;
             
             vertex[0] = x;
