@@ -21,10 +21,16 @@ class RippleView(context: Context) extends GLSurfaceView(context) with Logger {
       val actionIndex = event.getActionIndex
       val x = event.getX(actionIndex)
       val y = event.getY(actionIndex)
+      
+      val (worldX, worldY) = renderer.toWorldCoordinates(x, y)
+      
+      val character = KeyLayout.closest(worldX, worldY)
+      
+      d("Character: " + character)
 
       queueEvent(new Runnable() {
           def run() {
-            renderer.startRipple(x, y)
+            renderer.startRipple(worldX, worldY)
           }
         })
       true

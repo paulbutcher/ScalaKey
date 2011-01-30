@@ -87,10 +87,12 @@ class RippleRenderer(context: Context) extends Renderer with Logger {
     gl.glLoadIdentity
   }
   
+  def toWorldCoordinates(x: Float, y: Float) = (
+      x / windowWidth * meshWidth - meshWidth / 2,
+      (windowHeight - y) / windowHeight * meshHeight - meshHeight / 2
+    )
+  
   def startRipple(x: Float, y: Float) {
-    val worldX = x / windowWidth * meshWidth - meshWidth / 2
-    val worldY = (windowHeight - y) / windowHeight * meshHeight - meshHeight / 2
-    
-    mesh.startRipple(worldX, worldY)
+    mesh.startRipple(x, y)
   }
 }
