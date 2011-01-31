@@ -23,18 +23,22 @@ class Mesh private (width_ : Float, height_ : Float, columns_ : Int, rows_ : Int
   
   initializeBuffers
   
-  var rippleX = 0.0f
-  var rippleY = 0.0f
-  var startTime = 0L
+  val rippleCount = 3
+  var rippleIndex = 0
+  val rippleXs = new Array[Float](rippleCount)
+  val rippleYs = new Array[Float](rippleCount)
+  val rippleTimes = new Array[Long](rippleCount)
   
   def startRipple(x: Float, y: Float) {
-    startTime = System.currentTimeMillis
-    rippleX = x
-    rippleY = y
+    rippleXs(rippleIndex) = x
+    rippleYs(rippleIndex) = y
+    rippleTimes(rippleIndex) = System.currentTimeMillis
+    
+    rippleIndex = (rippleIndex + 1) % rippleCount
   }
   
   def update() {
-    ripple(System.currentTimeMillis - startTime)
+    ripple(System.currentTimeMillis)
   }
 
   private def allocateDirectFloatBuffer(size: Int) = {
