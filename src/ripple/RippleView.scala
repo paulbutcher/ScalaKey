@@ -26,7 +26,7 @@ class RippleView(context: Context) extends GLSurfaceView(context) with Logger {
       
       val character = KeyLayout.closest(worldX, worldY)
       
-      d("Character: " + character)
+      keyListener.onKey(character)
 
       queueEvent(new Runnable() {
           def run() {
@@ -45,4 +45,10 @@ class RippleView(context: Context) extends GLSurfaceView(context) with Logger {
     val width = display.getWidth
     (width, (width / renderer.aspectRatio).toInt)
   }
+  
+  def setKeyListener(keyListener: KeyListener) {
+    this.keyListener = keyListener
+  }
+  
+  private var keyListener: KeyListener = _
 }

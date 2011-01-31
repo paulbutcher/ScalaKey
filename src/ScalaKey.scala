@@ -6,11 +6,16 @@ import android.os.{Bundle, IBinder, ResultReceiver}
 import android.view.KeyEvent
 import android.view.inputmethod.{CompletionInfo, EditorInfo, ExtractedText, InputBinding, InputConnection}
 
-class ScalaKey extends AbstractInputMethodService with Logger {
+class ScalaKey extends AbstractInputMethodService with KeyListener with Logger {
   
   override def onCreate() {
     d("OnCreate")
+    
+    val view = new RippleView(this)
+    view.setKeyListener(this)
+
     softInputWindow = new SoftInputWindow(this)
+    softInputWindow.setContentView(view)
   }
 
   class InputMethodImpl extends AbstractInputMethodImpl {
@@ -30,10 +35,29 @@ class ScalaKey extends AbstractInputMethodService with Logger {
       softInputWindow.hide
     }
     
-    def restartInput(inputConnection: InputConnection, attribute: EditorInfo) { d("restartInput") }
-    def startInput(inputConnection: InputConnection, info: EditorInfo) { d("startInput") }
-    def unbindInput() { d("unbindInput") }
-    def bindInput(binding: InputBinding) { d("bindInput") }
+    def startInput(inputConnection: InputConnection, info: EditorInfo) {
+      d("startInput")
+      
+      startedInputConnection = inputConnection
+    }
+
+    def restartInput(inputConnection: InputConnection, attribute: EditorInfo) {
+      d("restartInput")
+      
+      startedInputConnection = inputConnection
+    }
+
+    def bindInput(binding: InputBinding) {
+      d("bindInput")
+      
+      boundInputConnection = binding.getConnection
+    }
+
+    def unbindInput() {
+      d("unbindInput")
+      
+      boundInputConnection = null
+    }
   }
   
   class InputMethodSessionImpl extends AbstractInputMethodSessionImpl {
@@ -43,7 +67,12 @@ class ScalaKey extends AbstractInputMethodService with Logger {
     def displayCompletions(completions: Array[CompletionInfo]) { d("displayCompletions") }
     def updateCursor(newCursor: Rect) { d("updateCursor") }
     def updateSelection(oldSelStart: Int, oldSelEnd: Int, newSelStart: Int, newSelEnd: Int, candidatesStart: Int, candidatesEnd: Int) { d("updateSelection") }
-    def finishInput() { d("finishInput") }
+
+    def finishInput() {
+      d("finishInput")
+      
+      startedInputConnection = null
+    }
   }
   
   def onCreateInputMethodInterface(): AbstractInputMethodImpl = new InputMethodImpl
@@ -55,5 +84,18 @@ class ScalaKey extends AbstractInputMethodService with Logger {
   def onKeyMultiple(keyCode: Int, count: Int, event: KeyEvent) = false
   def onKeyUp(keyCode: Int, event: KeyEvent) = false
   
+  def onKey(character: Char) {
+    currentInputConnection.commitText(character.toString, 1)
+  }
+  
+  private def currentInputConnection =
+    if (startedInputConnection != null)
+      startedInputConnection
+    else
+      boundInputConnection
+  
   private var softInputWindow: SoftInputWindow = _
+
+  private var startedInputConnection: InputConnection = _
+  private var boundInputConnection: InputConnection = _
 }
