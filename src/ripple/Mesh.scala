@@ -4,6 +4,7 @@ import java.nio.{ByteBuffer, ByteOrder, FloatBuffer, ShortBuffer}
 
 class Mesh private (width_ : Float, height_ : Float, columns_ : Int, rows_ : Int) {
   
+  // Constructor parameters have to be true members to be available to JNI
   val width = width_
   val height = height_
   val columns = columns_
