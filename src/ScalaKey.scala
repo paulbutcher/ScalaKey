@@ -46,25 +46,21 @@ class ScalaKey extends AbstractInputMethodService with Logger {
     
     def startInput(inputConnection: InputConnection, info: EditorInfo) {
       d("startInput")
-      
       startedInputConnection = inputConnection
     }
 
     def restartInput(inputConnection: InputConnection, attribute: EditorInfo) {
       d("restartInput")
-      
       startedInputConnection = inputConnection
     }
 
     def bindInput(binding: InputBinding) {
       d("bindInput")
-      
       boundInputConnection = binding.getConnection
     }
 
     def unbindInput() {
       d("unbindInput")
-      
       boundInputConnection = null
     }
   }
@@ -79,7 +75,6 @@ class ScalaKey extends AbstractInputMethodService with Logger {
 
     def finishInput() {
       d("finishInput")
-      
       startedInputConnection = null
     }
   }

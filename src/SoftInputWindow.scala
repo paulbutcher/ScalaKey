@@ -17,8 +17,8 @@ class SoftInputWindow(context: Context, theme: Int) extends Dialog(context, them
   def initDockWindow() {
     d("initDockWindow")
 
-    var window = getWindow
-    var lp = window.getAttributes
+    val window = getWindow
+    val lp = window.getAttributes
     
     lp.`type` = WindowManager.LayoutParams.TYPE_INPUT_METHOD
     lp.setTitle("InputMethod")
@@ -38,8 +38,8 @@ class SoftInputWindow(context: Context, theme: Int) extends Dialog(context, them
   }
   
   def setToken(token: IBinder) {
-    var window = getWindow
-    var lp = window.getAttributes
+    val window = getWindow
+    val lp = window.getAttributes
     lp.token = token
     window.setAttributes(lp)
   }
