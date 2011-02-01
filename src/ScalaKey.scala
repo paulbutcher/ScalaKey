@@ -6,17 +6,26 @@ import android.os.{Bundle, IBinder, ResultReceiver}
 import android.view.KeyEvent
 import android.view.inputmethod.{CompletionInfo, EditorInfo, ExtractedText, InputBinding, InputConnection}
 
-class ScalaKey extends AbstractInputMethodService with KeyListener with Logger {
+class ScalaKey extends AbstractInputMethodService with Logger {
   
   override def onCreate() {
     d("OnCreate")
     
     val view = new RippleView(this)
-    view.setKeyListener(this)
+    view.setKeyListener(new KeyListenerImpl)
 
     softInputWindow = new SoftInputWindow(this)
     softInputWindow.setContentView(view)
   }
+  
+  def onCreateInputMethodInterface() = new InputMethodImpl
+  
+  def onCreateInputMethodSessionInterface() = new InputMethodSessionImpl
+  
+  def onKeyDown(keyCode: Int, event: KeyEvent) = false
+  def onKeyLongPress(keyCode: Int, event: KeyEvent) = false
+  def onKeyMultiple(keyCode: Int, count: Int, event: KeyEvent) = false
+  def onKeyUp(keyCode: Int, event: KeyEvent) = false
 
   class InputMethodImpl extends AbstractInputMethodImpl {
 
@@ -75,17 +84,11 @@ class ScalaKey extends AbstractInputMethodService with KeyListener with Logger {
     }
   }
   
-  def onCreateInputMethodInterface(): AbstractInputMethodImpl = new InputMethodImpl
+  class KeyListenerImpl extends KeyListener {
   
-  def onCreateInputMethodSessionInterface(): AbstractInputMethodSessionImpl = new InputMethodSessionImpl
-  
-  def onKeyDown(keyCode: Int, event: KeyEvent) = false
-  def onKeyLongPress(keyCode: Int, event: KeyEvent) = false
-  def onKeyMultiple(keyCode: Int, count: Int, event: KeyEvent) = false
-  def onKeyUp(keyCode: Int, event: KeyEvent) = false
-  
-  def onKey(character: Char) {
-    currentInputConnection.commitText(character.toString, 1)
+    def onKey(character: Char) {
+      currentInputConnection.commitText(character.toString, 1)
+    }
   }
   
   private def currentInputConnection =
